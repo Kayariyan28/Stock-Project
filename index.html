@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Price Prediction App</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e7f3fe;
+            border-left: 6px solid #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container">
+        <h1>Stock Price Prediction</h1>
+        <input v-model="symbol" placeholder="Enter stock symbol (e.g., AAPL)">
+        <input v-model.number="days" type="number" placeholder="Number of days to predict">
+        <button @click="predict">Predict</button>
+        <div v-if="prediction" class="result">
+            <h2>Prediction for {{ prediction.symbol }}</h2>
+            <p>Last Price: ${{ prediction.last_price.toFixed(2) }}</p>
+            <p>Predicted Price: ${{ prediction.predicted_price.toFixed(2) }}</p>
+            <p>Predicted Change: {{ prediction.predicted_change_percent.toFixed(2) }}%</p>
+            <p>Prediction Date: {{ prediction.prediction_date }}</p>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                symbol: '',
+                days: 1,
+                prediction: null
+            },
+            methods: {
+                predict() {
+                    axios.post('http://127.0.0.1:5000/predict', {
+                        symbol: this.symbol,
+                        days: this.days
+                    })
+                    .then(response => {
+                        this.prediction = response.data;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while fetching the prediction.');
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
